@@ -11,9 +11,15 @@ exports.signup = async (req, res) => {
 
     const user = await User.create({ name, email, password });
 
-    if (user) {
-      setToken(res, user, "user created");
+    const token = setToken(user._id);
+
+    if (user.role == 1) {
+      return res
+        .cookie("token", token)
+        .cookie("role", "admin")
+        .json("user found");
     }
+    return res.cookie("token", token).json("created");
   } catch (error) {
     console.log(error);
   }
@@ -32,7 +38,16 @@ exports.signin = async (req, res) => {
       return res.json("invalid password");
     }
 
-    setToken(res, user, "user found");
+    const token = setToken(user._id);
+
+    if (user.role == 1) {
+      return res
+        .cookie("token", token)
+        .cookie("role", "admin")
+        .json("user found");
+    }
+
+    return res.cookie("token", token).json("user found");
   } catch (error) {
     console.log(error);
   }
@@ -88,10 +103,7 @@ exports.del = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    res.clearCookie("token", {
-      sameSite: "Strict", // Include this if it was set when the cookie was created
-      httpOnly: true, // Include if it was set when the cookie was created
-    });
+    res.clearCookie("token").clearCookie("role");
     res.json("user logout");
   } catch (error) {
     console.log(error);
