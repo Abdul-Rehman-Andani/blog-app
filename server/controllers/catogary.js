@@ -3,7 +3,8 @@ const { Catogary } = require("../models/catogary");
 //  ? read
 exports.read = async (req, res) => {
   try {
-    const data = await Catogary.aggregate([{$group: {_id: "$name", count: {$sum : 1}} }]);
+    const data = await Catogary.find();
+    console.log(data)
     res.json(data);
   } catch (error) {
     console.log(error);
@@ -32,3 +33,4 @@ exports.count = async (req, res) => {
     console.log(error);
   }
 };
+
